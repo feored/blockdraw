@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "blockdraw-svelte", "blockdraw-svelte.csproj", "{0A3A873F-29A2-4953-83B7-E66569898BA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blockdraw", "Blockdraw.csproj", "{0A3A873F-29A2-4953-83B7-E66569898BA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
