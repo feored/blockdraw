@@ -39,6 +39,27 @@
 
 	let map_path: string = $state('');
 	let map_info: any = $state(null);
+	let images: FileList | null = $state(null);
+
+	$effect(() => {
+		if (images && (images as FileList).length > 0) {
+			const file = images[0];
+			if (!file) {
+				console.error('No file selected');
+			}
+			console.log(file);
+			console.log('Opening image: ' + file.name);
+			const reader = new FileReader();
+			reader.onload = async (e) => {
+				var message = {
+					command: 'open_image',
+					data: String(reader.result).split(',')[1]
+				};
+				sendMessage(message);
+			};
+			reader.readAsDataURL(file);
+		}
+	});
 
 	function openMap() {
 		console.log('Opening map: ' + map_path);
@@ -65,3 +86,6 @@
 		<p>Z:{map_info.size.z}</p>
 	</div>
 {/if}
+
+<label for="image">Choose an image</label>
+<input type="file" id="image" accept="image/*" bind:files={images} />

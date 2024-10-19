@@ -116,6 +116,9 @@ namespace BlockDraw
                 case "open_map":
                     OpenMap(window, message.Data);
                     break;
+                case "open_image":
+                    OpenImage(window, message.Data);
+                    break;
                 default:
                     Console.WriteLine($"Received unknown command: {message.Command}");
                     break;
@@ -151,6 +154,22 @@ namespace BlockDraw
             }
             MapInfo mapInfo = builder.GetMapInfo();
             SendMessage(window, "map_info", mapInfo);
+        }
+
+        static void OpenImage(PhotinoWindow window, string imageb64)
+        {
+            try
+            {
+                var pixels = ImageHelper.GetPixels(new MemoryStream(Convert.FromBase64String(imageb64)));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error opening image: {e.Message}");
+                SendError(window, e.Message);
+                return;
+            }
+            SendMessage(window, "image_opened", null);
+
         }
     }
 }

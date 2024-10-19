@@ -58,9 +58,9 @@ public class ImageHelper
         return closestIdent;
     }
 
-    public static List<Pixel> GetPixels(string imagePath)
+    public static List<Pixel> GetPixels(Stream imageStream)
     {
-        using Image<Rgba32> image = Image.Load<Rgba32>(imagePath);
+        using Image<Rgba32> image = Image.Load<Rgba32>(imageStream);
 
         List<Pixel> pixels = new List<Pixel>();
         image.ProcessPixelRows(accessor =>
