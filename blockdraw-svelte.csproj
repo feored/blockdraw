@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Platforms>AnyCPU</Platforms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+    <EmbedWwwRoot>false</EmbedWwwRoot>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="GBX.NET" Version="2.0.9" />
+    <PackageReference Include="GBX.NET.LZO" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.10" Condition=" '$(GenerateEmbeddedFilesManifest)' == 'true' " />
+    <PackageReference Include="Photino.NET" Version="2.3.0" />
+    <PackageReference Include="Photino.NET.Server" Version="1.2.1" />
+    <PackageReference Include="SixLabors.ImageSHarp" Version="3.1.5" />
+  </ItemGroup>
+
+  <PropertyGroup>
+		<UiRoot>front\</UiRoot>
+    <UiBuildOutput>build\</UiBuildOutput>
+		<WwwRoot Condition=" '$(EmbedWwwRoot)' != 'true' ">wwwroot\</WwwRoot>
+		<WwwRoot Condition=" '$(EmbedWwwRoot)' == 'true' ">Resources\wwwroot\</WwwRoot>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Don't publish the UI source files, but do show them in the project files list -->
+		<Content Remove="$(UiRoot)**" />
+		<None Remove="$(UiRoot)**" />
+		<None Include="$(UiRoot)**" Exclude="$(UiRoot)node_modules\**" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\**" Condition=" '$(GenerateEmbeddedFilesManifest)' == 'true' " />
+	</ItemGroup>
+
+	<Target Name="EnsureNodeEnv" BeforeTargets="BuildUserInterface" Condition=" !Exists('$(UiRoot)node_modules') ">
+		<!-- Ensure Node.js is installed -->
+		<Exec Command="node --version" ContinueOnError="true">
+			<Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+		</Exec>
+		<Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
+	</Target>
+
+
+	<Target Name="BuildUserInterface" BeforeTargets="BeforeBuild">
+		<!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
+		<Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
+		<Exec WorkingDirectory="$(UiRoot)" Command="npm install" />
+		<Exec WorkingDirectory="$(UiRoot)" Command="npm run build" />
+		
+		<ItemGroup>
+			<UiBuildOutputFiles Include="$(UiRoot)$(UiBuildOutput)**\*.*" />
+		</ItemGroup>
+		
+		<Copy SourceFiles="@(UiBuildOutputFiles)" DestinationFiles="@(UiBuildOutputFiles->'$(WwwRoot)%(RecursiveDir)%(Filename)%(Extension)')" />
+
+		<MakeDir Directories="$(TargetDir)\$(WwwRoot)" Condition=" '$(EmbedWwwRoot)' != 'true' And !Exists('$(TargetDir\$(WwwRoot)') " />
+
+		<Copy SourceFiles="@(UiBuildOutputFiles)" DestinationFiles="@(UiBuildOutputFiles->'$(TargetDir)\$(WwwRoot)%(RecursiveDir)%(Filename)%(Extension)')" Condition=" '$(EmbedWwwRoot)' != 'true' " />
+
+		<RemoveDir Directories="$(UiRoot)$(UiBuildOutput)" />
+	</Target>
+
+</Project>
