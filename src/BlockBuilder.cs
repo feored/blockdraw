@@ -56,12 +56,42 @@ public class BlockBuilder
         map.PlaceAnchoredObject(model, point, Vec3.Zero);
     }
 
-    public void save_map(string path = "")
+    public void DrawPalettizedImage(List<Pixel> pixels)
+    {
+        var scale = 4;
+        var max_y = 32 * 32;
+        foreach (Pixel pixel in pixels)
+        {
+            var basex = 32 * 24;
+            var basez = 32 * 24;
+            //var pos = new Int3(pixel.coords.X * scale, 64 * 4 - (pixel.coords.Y * scale), 0);
+            var pos = new Int3(basex + pixel.coords.X * scale, 16, basez + pixel.coords.Y * scale);
+            var block = ImageHelper.colorToIdent[pixel.color];
+            addAnchordObject(block, pos);
+        }
+    }
+
+    public void Save(string path = "")
     {
         if (path != "")
         {
             map_path = path;
         }
         map.Save(map_path);
+    }
+
+    public void WipePalette(List<Ident> palette)
+    {
+        if (palette.Count == 0 || map.AnchoredObjects == null || map.AnchoredObjects.Count == 0)
+        {
+            return;
+        }
+        foreach (CGameCtnAnchoredObject anchoredObject in map.AnchoredObjects.ToList())
+        {
+            if (palette.Contains(anchoredObject.ItemModel))
+            {
+                map.RemoveAnchoredObject(anchoredObject);
+            }
+        }
     }
 }

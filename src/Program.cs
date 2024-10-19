@@ -39,6 +39,7 @@ namespace BlockDraw
         };
 
         static BlockBuilder builder = null;
+        static ImageInfo imageInfo = null;
         [STAThread]
         static void Main(string[] args)
         {
@@ -119,6 +120,15 @@ namespace BlockDraw
                 case "open_image":
                     OpenImage(window, message.Data);
                     break;
+                case "draw":
+                    Draw(window, message.Data);
+                    break;
+                case "wipe":
+                    WipePalette(window, message.Data);
+                    break;
+                case "save":
+                    Save(window, message.Data);
+                    break;
                 default:
                     Console.WriteLine($"Received unknown command: {message.Command}");
                     break;
@@ -145,6 +155,8 @@ namespace BlockDraw
             try
             {
                 builder = new BlockBuilder(url);
+                MapInfo mapInfo = builder.GetMapInfo();
+                SendMessage(window, "map_info", mapInfo);
             }
             catch (Exception e)
             {
@@ -152,15 +164,14 @@ namespace BlockDraw
                 SendError(window, e.Message);
                 return;
             }
-            MapInfo mapInfo = builder.GetMapInfo();
-            SendMessage(window, "map_info", mapInfo);
         }
 
         static void OpenImage(PhotinoWindow window, string imageb64)
         {
             try
             {
-                var pixels = ImageHelper.GetPixels(new MemoryStream(Convert.FromBase64String(imageb64)));
+                imageInfo = ImageInfo.FromBytes(Convert.FromBase64String(imageb64));
+                SendMessage(window, "image_info", imageInfo);
             }
             catch (Exception e)
             {
@@ -168,8 +179,55 @@ namespace BlockDraw
                 SendError(window, e.Message);
                 return;
             }
-            SendMessage(window, "image_opened", null);
 
+        }
+
+        static void Draw(PhotinoWindow window, string data)
+        {
+            try
+            {
+                builder.DrawPalettizedImage(imageInfo.Pixels);
+                Console.WriteLine("Image drawn.");
+                SendError(window, "Successfully drawn image.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error drawing image: {e.Message}");
+                SendError(window, e.Message);
+                return;
+            }
+        }
+
+        static void Save(PhotinoWindow window, string data)
+        {
+            try
+            {
+                builder.Save();
+                Console.WriteLine("Map saved.");
+                SendError(window, "Successfully saved map.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error saving map: {e.Message}");
+                SendError(window, e.Message);
+                return;
+            }
+        }
+
+        static void WipePalette(PhotinoWindow window, string data)
+        {
+            try
+            {
+                builder.WipePalette([.. ImageHelper.colorToIdent.Values]);
+                Console.WriteLine("Palette wiped.");
+                SendError(window, "Successfully wiped.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error wiping palette: {e.Message}");
+                SendError(window, e.Message);
+                return;
+            }
         }
     }
 }

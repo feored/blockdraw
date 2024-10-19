@@ -5,9 +5,9 @@
 	import { Github } from 'lucide-svelte';
 </script>
 
-<slot />
-<footer>
+<header>
 	<div style="text-align:right;">
 		<i>v{version}</i>
 	</div>
-</footer>
+</header>
+<slot />
