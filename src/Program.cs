@@ -188,6 +188,7 @@ namespace BlockDraw
             try
             {
                 DrawOptions options = JsonSerializer.Deserialize<DrawOptions>(data, json_options);
+                builder.DrawPalettizedImage(imageInfo, options);
                 SendError(window, "Successfully drawn image.");
             }
             catch (Exception e)
