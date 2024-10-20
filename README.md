@@ -2,9 +2,12 @@
 
 An application to draw images using custom items in Trackmania 2.
 
+![screenshot](assets/screenshot.png)
+
+
 ### Usage
 
-1. Unzip colors.zip and move the contents into your Items folder (by default in `C:\Users\foo\Documents\Maniaplanet\Items` on Windows), so as to have e.g `Items/colors/blue1.Item.Gbx`.
+1. __Download and unzip [colors.zip](assets/colors.zip) and move the contents into your Items folder__ (by default in `C:\Users\foo\Documents\Maniaplanet\Items` on Windows), so as to have e.g `Items/colors/blue1.Item.Gbx`.
 
 2. Launch Blockdraw and enter the path to the map you wish to modify, e.g `C:\Users\foo\Documents\Maniaplanet\My Maps\test.Map.Gbx`.
 
@@ -22,6 +25,10 @@ This application works by using a set of pre-generated items, each 4x4 squares (
 A future update will allow you to substitute blocks of your choice for the ones provided by default.
 
 Each pixel in the given image (if not transparent) is converted to the nearest color available in the default items and placed on the map at the corresponding location.
+
+Here is the default palette:
+
+![palette](assets/palette.png)
 
 __Drawing Options__ 
 
