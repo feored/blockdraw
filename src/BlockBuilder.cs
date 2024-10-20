@@ -8,6 +8,12 @@ public class MapInfo
     public string Name { get; set; } = "";
     public Int3 size { get; set; } = new Int3(0, 0, 0);
 }
+
+public class DrawOptions
+{
+    public Vec3 StartPosition { get; set; }
+    public bool Horizontal { get; set; }
+}
 public class BlockBuilder
 {
     private string map_path;
@@ -56,17 +62,23 @@ public class BlockBuilder
         map.PlaceAnchoredObject(model, point, Vec3.Zero);
     }
 
-    public void DrawPalettizedImage(List<Pixel> pixels)
+    public void DrawPalettizedImage(List<Pixel> pixels, DrawOptions options)
     {
         var scale = 4;
-        var max_y = 32 * 32;
+        // default size of a block in TM Stadium is 32x32x8
+        Int3 start = new Int3((int)options.StartPosition.X * 32, (int)options.StartPosition.Y * 8, (int)options.StartPosition.Z * 32);
         foreach (Pixel pixel in pixels)
         {
-            var basex = 32 * 24;
-            var basez = 32 * 24;
-            //var pos = new Int3(pixel.coords.X * scale, 64 * 4 - (pixel.coords.Y * scale), 0);
-            var pos = new Int3(basex + pixel.coords.X * scale, 16, basez + pixel.coords.Y * scale);
-            var block = ImageHelper.colorToIdent[pixel.color];
+            Int3 pos = new Int3();
+            if (options.Horizontal)
+            {
+                pos = new Int3(start.X + pixel.coords.X * scale, start.Y, start.Z + pixel.coords.Y * scale);
+            }
+            else
+            {
+                pos = new Int3(pixel.coords.X * scale, start.Y - (pixel.coords.Y * scale), 0);
+            }
+            var block = ImageHelper.ColorToIdent[pixel.color];
             addAnchordObject(block, pos);
         }
     }

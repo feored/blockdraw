@@ -186,7 +186,8 @@ namespace BlockDraw
         {
             try
             {
-                builder.DrawPalettizedImage(imageInfo.Pixels);
+                DrawOptions options = JsonSerializer.Deserialize<DrawOptions>(data, json_options);
+                builder.DrawPalettizedImage(imageInfo.Pixels, options);
                 Console.WriteLine("Image drawn.");
                 SendError(window, "Successfully drawn image.");
             }
@@ -218,7 +219,7 @@ namespace BlockDraw
         {
             try
             {
-                builder.WipePalette([.. ImageHelper.colorToIdent.Values]);
+                builder.WipePalette([.. ImageHelper.ColorToIdent.Values]);
                 Console.WriteLine("Palette wiped.");
                 SendError(window, "Successfully wiped.");
             }

@@ -7,7 +7,7 @@
 			console.log('Received message: ' + message);
 			handleMessage(message);
 		});
-		sendMessage({ command: 'default_map_location' });
+		sendMessage({ command: 'default_map_location', data: '' });
 	});
 
 	function sendMessage(Message: Message) {
@@ -40,10 +40,19 @@
 		}
 	}
 
+	const MAX_RECOMMENDED_BLOCKS = 50000;
 	let map_path: string = $state('');
 	let map_info: any = $state(null);
 	let images: FileList | null = $state(null);
 	let image_info: any = $state(null);
+	let draw_options = $state({
+		position: {
+			x: 0,
+			y: 2,
+			z: 0
+		},
+		horizontal: true
+	});
 
 	$effect(() => {
 		if (images && (images as FileList).length > 0) {
@@ -107,19 +116,54 @@
 				</div>
 				<p>Preview:</p>
 				<img src={image_info.preview} alt="Preview" />
-				<div>
-					<button onclick={() => sendMessage({ command: 'draw', data: '' })}>Draw</button>
-				</div>
+				{#if image_info.blockCount > MAX_RECOMMENDED_BLOCKS}
+					<p class="severe">
+						Warning: This image has {image_info.blockCount} blocks. It is recommended to keep the number
+						of blocks below {MAX_RECOMMENDED_BLOCKS} for performance reasons.
+					</p>
+				{/if}
+
+				<fieldset>
+					<legend>Options</legend>
+					<div>
+						<p>Position</p>
+						<div class="flex">
+							<label
+								>X
+								<input type="number" step="1" bind:value={draw_options.position.x} /></label
+							>
+							<label
+								>Y
+								<input type="number" step="1" bind:value={draw_options.position.y} /></label
+							>
+							<label
+								>Z
+								<input type="number" step="1" bind:value={draw_options.position.z} /></label
+							>
+						</div>
+					</div>
+					<div>
+						<p>Orientation</p>
+						<label
+							>{draw_options.horizontal ? 'Horizontal' : 'Vertical'}
+							<input type="checkbox" id="horizontal" bind:checked={draw_options.horizontal} />
+						</label>
+					</div>
+
+					<div>
+						<button onclick={() => sendMessage({ command: 'draw', data: '' })}>Draw</button>
+					</div>
+				</fieldset>
 			{/if}
 		</fieldset>
 	{/if}
 
 	{#if map_info}
 		<hr />
-		<button onclick={() => sendMessage({ command: 'wipe', data: '' })} type="reset"
-			>Wipe All Pixel Items From Map</button
-		>
-		<div>
+		<div class="flex">
+			<button onclick={() => sendMessage({ command: 'wipe', data: '' })} type="reset"
+				>Wipe All Pixel Items From Map</button
+			>
 			<button onclick={() => sendMessage({ command: 'save', data: '' })} type="submit"
 				>Save Map</button
 			>

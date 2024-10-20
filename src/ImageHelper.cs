@@ -1,5 +1,7 @@
+using System.Reflection.Metadata;
 using GBX.NET;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.ColorSpaces.Conversion;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
@@ -46,36 +48,34 @@ public class ImageInfo
         return imageInfo;
     }
 }
+
 public class ImageHelper
 {
-    public static List<Rgba32> colors = new List<Rgba32>{
-        new Rgba32(18, 80, 150),
-        new Rgba32(160, 160, 160),
-        new Rgba32(100, 62, 37),
-        new Rgba32(52, 101, 46),
-        new Rgba32(220, 220, 220),
-        new Rgba32(0, 0, 0),
-        new Rgba32(220, 20, 0),
-        new Rgba32(55, 55, 55),
-        new Rgba32(220, 200, 0),
-        new Rgba32(242, 129, 0),
-        new Rgba32(123, 214, 255),
-        new Rgba32(53, 172, 74),
+
+    public static Dictionary<Rgba32, Ident> ColorToIdent = new Dictionary<Rgba32, Ident>(){
+        {new Rgba32(52, 101, 46), new Ident("colors\\green1.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(33, 119, 24), new Ident("colors\\green2.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(53, 172, 74), new Ident("colors\\green3.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(101, 182, 74), new Ident("colors\\green4.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(0, 0, 0), new Ident("colors\\black.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(55, 55, 55), new Ident("colors\\grey1.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(160, 160, 160), new Ident("colors\\grey2.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(220, 220, 220), new Ident("colors\\grey3.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(37, 189, 0), new Ident("colors\\green5.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(220, 20, 0), new Ident("colors\\red.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(0, 116, 247), new Ident("colors\\blue1.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(220, 200, 0), new Ident("colors\\yellow.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(33, 102, 162), new Ident("colors\\blue2.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(0, 174, 255), new Ident("colors\\blue3.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(123, 214, 255), new Ident("colors\\blue4.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(242, 129, 0), new Ident("colors\\orange.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(102, 85, 63), new Ident("colors\\brown.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(255, 255, 255), new Ident("colors\\white.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(89, 7, 33), new Ident("colors\\magenta.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(23, 19, 41), new Ident("colors\\purple1.Item.Gbx", "Stadium", "feor")},
+        {new Rgba32(51, 63, 92), new Ident("colors\\purple2.Item.Gbx", "Stadium", "feor")}
     };
-    public static Dictionary<Rgba32, Ident> colorToIdent = new Dictionary<Rgba32, Ident>{
-        {new Rgba32(18, 80, 150), new Ident("misc\\blue1.Item.Gbx", "Stadium", "feor")},
-        {new Rgba32(160, 160, 160), new Ident("misc\\grey.Item.Gbx", "Stadium", "feor")},
-        {new Rgba32(100, 62, 37), new Ident("misc\\brown.Item.Gbx", "Stadium", "feor")},
-        {new Rgba32(52, 101, 46), new Ident("misc\\green1.Item.Gbx", "Stadium", "feor")},
-        {new Rgba32(220, 220, 220), new Ident("misc\\white.Item.Gbx", "Stadium", "feor")},
-        {new Rgba32(0, 0, 0), new Ident("misc\\black.Item.Gbx", "Stadium", "feor")},
-        {new Rgba32(220, 20, 0), new Ident("misc\\red.Item.Gbx", "Stadium", "feor")},
-        {new Rgba32(55, 55, 55), new Ident("misc\\darkgrey.Item.Gbx", "Stadium", "feor")},
-        {new Rgba32(220, 200, 0), new Ident("misc\\yellow.Item.Gbx", "Stadium", "feor")},
-        {new Rgba32(242, 129, 0), new Ident("misc\\orange.Item.Gbx", "Stadium", "feor")},
-        {new Rgba32(123, 214, 255), new Ident("misc\\lightblue.Item.Gbx", "Stadium", "feor")},
-        {new Rgba32(53, 172, 74), new Ident("misc\\green3.Item.Gbx", "Stadium", "feor")},
-    };
+
 
     public static double ColorDifference(Rgba32 color1, Rgba32 color2)
     {
@@ -99,8 +99,8 @@ public class ImageHelper
                 continue;
             }
             double mindiff = -1;
-            Rgba32 closest = colors[0];
-            foreach (Rgba32 color in colors)
+            Rgba32 closest = ColorToIdent.Keys.First();
+            foreach (Rgba32 color in ColorToIdent.Keys)
             {
                 double diff = ColorDifference(pixel.color, color);
                 if (mindiff == -1 || diff < mindiff)
@@ -117,9 +117,9 @@ public class ImageHelper
 
     public static Ident GetClosestIdent(Rgba32 color)
     {
-        Ident closestIdent = new Ident("misc\\blue1.Item.Gbx", "Stadium", "feor");
+        Ident closestIdent = new Ident("colors\\blue1.Item.Gbx", "Stadium", "feor");
         double minDiff = -1;
-        foreach (KeyValuePair<Rgba32, Ident> entry in colorToIdent)
+        foreach (KeyValuePair<Rgba32, Ident> entry in ColorToIdent)
         {
             double diff = ColorDifference(color, entry.Key);
             if (minDiff == -1 || diff < minDiff)
