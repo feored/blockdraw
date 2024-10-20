@@ -105,7 +105,6 @@ namespace BlockDraw
                 return;
             }
             Message message = JsonSerializer.Deserialize<Message>(jsonMessage, json_options);
-            Console.WriteLine(message);
             switch (message.Command)
             {
                 case "exit":
@@ -154,6 +153,7 @@ namespace BlockDraw
         {
             try
             {
+                url = JsonSerializer.Deserialize<string>(url, json_options);
                 builder = new BlockBuilder(url);
                 MapInfo mapInfo = builder.GetMapInfo();
                 SendMessage(window, "map_info", mapInfo);
@@ -170,6 +170,7 @@ namespace BlockDraw
         {
             try
             {
+                imageb64 = JsonSerializer.Deserialize<string>(imageb64, json_options);
                 imageInfo = ImageInfo.FromBytes(Convert.FromBase64String(imageb64));
                 SendMessage(window, "image_info", imageInfo);
             }
@@ -187,8 +188,6 @@ namespace BlockDraw
             try
             {
                 DrawOptions options = JsonSerializer.Deserialize<DrawOptions>(data, json_options);
-                builder.DrawPalettizedImage(imageInfo.Pixels, options);
-                Console.WriteLine("Image drawn.");
                 SendError(window, "Successfully drawn image.");
             }
             catch (Exception e)

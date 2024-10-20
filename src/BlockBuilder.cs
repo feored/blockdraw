@@ -1,6 +1,9 @@
+using System.Numerics;
 using GBX.NET;
 using GBX.NET.Engines.Game;
 using GBX.NET.LZO;
+using Microsoft.AspNetCore.Hosting;
+
 
 public class MapInfo
 {
@@ -11,7 +14,8 @@ public class MapInfo
 
 public class DrawOptions
 {
-    public Vec3 StartPosition { get; set; }
+    public Vec3 Position { get; set; }
+    public Vec3 BlockRotation { get; set; }
     public bool Horizontal { get; set; }
 }
 public class BlockBuilder
@@ -57,17 +61,24 @@ public class BlockBuilder
         }
     }
 
-    public void addAnchordObject(Ident model, Int3 point)
+    public void addAnchoredObject(Ident model, Int3 point)
     {
         map.PlaceAnchoredObject(model, point, Vec3.Zero);
     }
 
-    public void DrawPalettizedImage(List<Pixel> pixels, DrawOptions options)
+    public void DrawPalettizedImage(ImageInfo imageInfo, DrawOptions options)
     {
         var scale = 4;
+        if (imageInfo.Pixels.Count == 0)
+        {
+            return;
+        }
+
         // default size of a block in TM Stadium is 32x32x8
-        Int3 start = new Int3((int)options.StartPosition.X * 32, (int)options.StartPosition.Y * 8, (int)options.StartPosition.Z * 32);
-        foreach (Pixel pixel in pixels)
+        Int3 start = new Int3((int)options.Position.X * 32, (int)options.Position.Y * 8, (int)options.Position.Z * 32);
+        Vec3 radiansRotations = (float)(Math.PI / 180) * options.BlockRotation;
+        // Convert to radians
+        foreach (Pixel pixel in imageInfo.Pixels)
         {
             Int3 pos = new Int3();
             if (options.Horizontal)
@@ -76,10 +87,9 @@ public class BlockBuilder
             }
             else
             {
-                pos = new Int3(pixel.coords.X * scale, start.Y - (pixel.coords.Y * scale), 0);
+                pos = new Int3(start.X + pixel.coords.X * scale, (start.Y + imageInfo.Height * scale) - (pixel.coords.Y * scale), start.Z);
             }
-            var block = ImageHelper.ColorToIdent[pixel.color];
-            addAnchordObject(block, pos);
+            map.PlaceAnchoredObject(ImageHelper.ColorToIdent[pixel.color], pos, radiansRotations);
         }
     }
 

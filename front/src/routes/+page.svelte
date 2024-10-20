@@ -15,6 +15,7 @@
 			console.error('Tried to send a message but the window.external object is not available');
 			return;
 		}
+		Message.data = JSON.stringify(Message.data);
 		console.log('Sending message for real: ' + JSON.stringify(Message));
 		window.external.sendMessage(JSON.stringify(Message));
 		console.log('Message sent');
@@ -49,6 +50,11 @@
 		position: {
 			x: 0,
 			y: 2,
+			z: 0
+		},
+		blockRotation: {
+			x: 0,
+			y: 0,
 			z: 0
 		},
 		horizontal: true
@@ -148,10 +154,27 @@
 							>{draw_options.horizontal ? 'Horizontal' : 'Vertical'}
 							<input type="checkbox" id="horizontal" bind:checked={draw_options.horizontal} />
 						</label>
-					</div>
+						<p>Per block rotation</p>
+						<div class="flex">
+							<label
+								>X
+								<input type="number" step="1" bind:value={draw_options.blockRotation.x} /></label
+							>
+							<label
+								>Y
+								<input type="number" step="1" bind:value={draw_options.blockRotation.y} /></label
+							>
+							<label
+								>Z
+								<input type="number" step="1" bind:value={draw_options.blockRotation.z} /></label
+							>
+						</div>
 
-					<div>
-						<button onclick={() => sendMessage({ command: 'draw', data: '' })}>Draw</button>
+						<div>
+							<button onclick={() => sendMessage({ command: 'draw', data: draw_options })}
+								>Draw</button
+							>
+						</div>
 					</div>
 				</fieldset>
 			{/if}
